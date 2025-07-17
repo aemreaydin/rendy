@@ -15,42 +15,58 @@ option(SANITIZE_UNDEFINED "Enable UndefinedBehaviorSanitizer (UBSan)" OFF)
 option(SANITIZE_LEAK "Enable LeakSanitizer (LSan)" OFF)
 option(SANITIZE_THREAD "Enable ThreadSanitizer (TSan)" OFF)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    if (SANITIZE_ADDRESS)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    if(SANITIZE_ADDRESS)
         add_compile_options(-fsanitize=address)
         add_link_options(-fsanitize=address)
         message(STATUS "AddressSanitizer (ASan) Enabled.")
     endif()
-    if (SANITIZE_UNDEFINED)
+    if(SANITIZE_UNDEFINED)
         add_compile_options(-fsanitize=undefined)
         add_link_options(-fsanitize=undefined)
         message(STATUS "UndefinedBehaviorSanitizer (UBSan) Enabled.")
     endif()
-    if (SANITIZE_LEAK AND NOT SANITIZE_ADDRESS)
+    if(SANITIZE_LEAK AND NOT SANITIZE_ADDRESS)
         add_compile_options(-fsanitize=leak)
         add_link_options(-fsanitize=leak)
         message(STATUS "LeakSanitizer (LSan) Enabled.")
     endif()
-    if (SANITIZE_THREAD)
+    if(SANITIZE_THREAD)
         add_compile_options(-fsanitize=thread)
         add_link_options(-fsanitize=thread)
         message(STATUS "ThreadSanitizer (TSan) Enabled.")
     endif()
 else()
-    if (SANITIZE_ADDRESS OR SANITIZE_UNDEFINED OR SANITIZE_LEAK OR SANITIZE_THREAD)
-        message(WARNING "Sanitizers requested but not supported by current compiler (${CMAKE_CXX_COMPILER_ID}).")
+    if(
+        SANITIZE_ADDRESS
+        OR SANITIZE_UNDEFINED
+        OR SANITIZE_LEAK
+        OR SANITIZE_THREAD
+    )
+        message(
+            WARNING
+            "Sanitizers requested but not supported by current compiler (${CMAKE_CXX_COMPILER_ID})."
+        )
     endif()
 endif()
 
-option(ENABLE_CLANG_TIDY "Enable Clang-Tidy analysis during build" OFF)
-if (ENABLE_CLANG_TIDY)
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy analysis during build" ON)
+if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY clang-tidy)
-    if (CLANG_TIDY)
+    if(CLANG_TIDY)
         set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY} -p=${CMAKE_BINARY_DIR})
         message(STATUS "Clang-Tidy enabled.")
     else()
-        message(WARNING "clang-tidy not found. Please install it to enable Clang-Tidy analysis.")
+        message(
+            WARNING
+            "clang-tidy not found. Please install it to enable Clang-Tidy analysis."
+        )
     endif()
+endif()
+
+option(ENABLE_IWYU "Enable Include What You Use" OFF)
+if(ENABLE_IWYU)
+    set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "include-what-you-use;-w;-Xiwyu")
 endif()
 
 find_package(Vulkan REQUIRED)

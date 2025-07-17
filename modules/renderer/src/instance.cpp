@@ -16,17 +16,18 @@ constexpr const char *kValidationLayer = "";
 auto Instance::Initialize(std::span<const char *const> window_extensions)
     -> bool {
 
-  VkApplicationInfo app_info = {.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                                .pNext = nullptr,
-                                .pApplicationName = kAppName,
-                                .pEngineName = kEngineName,
-                                .apiVersion = VK_MAKE_VERSION(1, 4, 0)};
+  const VkApplicationInfo app_info = {.sType =
+                                          VK_STRUCTURE_TYPE_APPLICATION_INFO,
+                                      .pNext = nullptr,
+                                      .pApplicationName = kAppName,
+                                      .pEngineName = kEngineName,
+                                      .apiVersion = VK_MAKE_VERSION(1, 4, 0)};
 
   std::vector<const char *> extension_names;
   extension_names.assign(window_extensions.begin(), window_extensions.end());
 
   spdlog::info("{}", fmt::join(extension_names, ", "));
-  VkInstanceCreateInfo instance_create_info{
+  const VkInstanceCreateInfo instance_create_info{
       .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 #ifdef __APPLE__
       .flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,

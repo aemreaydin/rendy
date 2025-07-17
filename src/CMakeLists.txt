@@ -8,7 +8,8 @@ add_executable(${PROJECT_NAME} main.cpp)
 #For this example, engine_core and renderer_vulkan are linked directly,
 #while game_logic is designed for dynamic loading(though not fully implemented
 #in this basic main.cpp).
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(
+    ${PROJECT_NAME}
     PRIVATE
         # common
         # engine_core
@@ -19,11 +20,12 @@ target_link_libraries(${PROJECT_NAME}
         Vulkan::Vulkan # Link Vulkan
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(
+    ${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/modules/renderer/include
-        # ${CMAKE_SOURCE_DIR}/modules/common/include
-        # ${CMAKE_SOURCE_DIR}/modules/engine_core/include
-        # ${CMAKE_SOURCE_DIR}/modules/game_logic/include 
+    # ${CMAKE_SOURCE_DIR}/modules/common/include
+    # ${CMAKE_SOURCE_DIR}/modules/engine_core/include
+    # ${CMAKE_SOURCE_DIR}/modules/game_logic/include
 )
