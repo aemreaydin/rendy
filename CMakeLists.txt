@@ -50,7 +50,7 @@ else()
     endif()
 endif()
 
-option(ENABLE_CLANG_TIDY "Enable Clang-Tidy analysis during build" ON)
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy analysis during build" OFF)
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY)

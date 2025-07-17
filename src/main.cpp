@@ -9,6 +9,7 @@ constexpr int kWidth = 800;
 constexpr int kHeight = 600;
 
 auto main() -> int {
+  spdlog::set_level(spdlog::level::level_enum::trace);
   spdlog::info("Starting Rendy...");
 
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
@@ -16,8 +17,7 @@ auto main() -> int {
     return 1;
   }
 
-  auto *sdl_window = SDL_CreateWindow("Vulkan Engine", kWidth, kHeight,
-                                      SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+  auto *sdl_window = SDL_CreateWindow("Vulkan Engine", kWidth, kHeight, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
   if (sdl_window == nullptr) {
     spdlog::error("Window could not be created! SDL_Error: {}", SDL_GetError());
     SDL_Quit();
@@ -38,6 +38,8 @@ auto main() -> int {
       }
     }
   }
+
+  renderer.Destroy();
 
   SDL_DestroyWindow(sdl_window);
   SDL_Quit();

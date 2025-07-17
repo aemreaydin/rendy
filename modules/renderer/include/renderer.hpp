@@ -8,6 +8,7 @@ class Renderer {
 
 public:
   void Initialize();
+  void Destroy();
 };
 
 } // namespace rendy::renderer::vulkan

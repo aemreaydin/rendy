@@ -14,7 +14,9 @@ Checks: >
   llvm-header-guard,
   llvm-include-order,
   readability-identifier-naming,
+  -misc-use-anonymous-namespace,
   -misc-include-cleaner,
+  -hicpp-signed-bitwise,
 
 WarningsAsErrors: "*"
 

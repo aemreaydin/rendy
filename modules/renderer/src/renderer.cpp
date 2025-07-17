@@ -9,19 +9,16 @@
 namespace rendy::renderer::vulkan {
 
 void Renderer::Initialize() {
-
   uint32_t sdl_instance_extension_count{0};
-  const auto *sdl_instance_extensions =
-      SDL_Vulkan_GetInstanceExtensions(&sdl_instance_extension_count);
-  const auto sdl_instance_extensions_span =
-      std::span{sdl_instance_extensions, sdl_instance_extension_count};
-  spdlog::info("Required instance extensions by SDL: {}",
-               fmt::join(sdl_instance_extensions_span, ", "));
+  const auto *sdl_instance_extensions = SDL_Vulkan_GetInstanceExtensions(&sdl_instance_extension_count);
+  const auto sdl_instance_extensions_span = std::span{sdl_instance_extensions, sdl_instance_extension_count};
 
   _instance = std::make_unique<Instance>();
   if (!_instance->Initialize(sdl_instance_extensions_span)) {
     throw std::runtime_error("Failed to create Vulkan instance.");
   }
 }
+
+void Renderer::Destroy() { _instance->Destroy(); }
 
 } // namespace rendy::renderer::vulkan
