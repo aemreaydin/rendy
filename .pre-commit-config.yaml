@@ -1,0 +1,5 @@
+repos:
+- repo: https://github.com/BlankSpruce/gersemi
+  rev: 0.21.0
+  hooks:
+  - id: gersemi
