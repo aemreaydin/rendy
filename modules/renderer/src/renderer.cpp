@@ -5,6 +5,7 @@
 #include <span>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
+#include <vulkan/vulkan.hpp>
 
 namespace rendy::renderer::vulkan {
 
@@ -14,7 +15,7 @@ void Renderer::Initialize() {
   const auto sdl_instance_extensions_span = std::span{sdl_instance_extensions, sdl_instance_extension_count};
 
   _instance = std::make_unique<Instance>();
-  if (!_instance->Initialize(sdl_instance_extensions_span)) {
+  if (_instance->Initialize(sdl_instance_extensions_span) == vk::False) {
     throw std::runtime_error("Failed to create Vulkan instance.");
   }
 }

@@ -1,29 +1,28 @@
+#pragma once
+
 #include <span>
 #include <vector>
-#include <vulkan/vulkan.h>
-#include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan.hpp>
 
 namespace rendy::renderer::vulkan {
 
 class Instance {
-  VkInstance _vk_instance;
-  VkDebugUtilsMessengerCreateInfoEXT _vk_debug_utils_messenger_create_info;
-  VkDebugUtilsMessengerEXT _vk_debug_utils_messenger;
-  PFN_vkCreateDebugUtilsMessengerEXT _fn_create_debug_utils_messenger;
-  PFN_vkDestroyDebugUtilsMessengerEXT _fn_destroy_debug_utils_messenger;
+  uint32_t _vk_api_version{0};
+  vk::Instance _vk_instance{nullptr};
+  vk::DebugUtilsMessengerCreateInfoEXT _vk_debug_utils_messenger_create_info{};
+  vk::DebugUtilsMessengerEXT _vk_debug_utils_messenger;
 
   void createDebugUtilsMessengerCreateInfo();
-  auto initializeDebugUtilsMessenger() -> VkResult;
-  void destroyDebugUtilsMessenger();
+  [[nodiscard]] auto initializeDebugUtilsMessenger() -> vk::Bool32;
 
   [[nodiscard]] static auto validateExtensions(const std::vector<const char *> &required_extensions) -> bool;
   [[nodiscard]] static auto validateLayers(const std::vector<const char *> &required_layers) -> bool;
 
 public:
-  [[nodiscard]] auto Initialize(std::span<const char *const>) -> bool;
-  void Destroy();
+  [[nodiscard]] auto Initialize(std::span<const char *const>) -> vk::Bool32;
+  void Destroy() const;
 
-  [[nodiscard]] auto Get() const -> VkInstance;
+  [[nodiscard]] auto Get() const -> vk::Instance;
 };
 
 } // namespace rendy::renderer::vulkan

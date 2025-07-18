@@ -1,5 +1,16 @@
 add_library(rendy_vulkan SHARED src/renderer.cpp src/instance.cpp)
-target_compile_definitions(rendy_vulkan PRIVATE $<$<CONFIG:Debug>:RENDY_DEBUG>)
+
+target_compile_definitions(
+    rendy_vulkan
+    PRIVATE
+        VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
+        VULKAN_HPP_NO_CONSTRUCTORS
+        VULKAN_HPP_NO_EXCEPTIONS
+)
+target_compile_definitions(
+    rendy_vulkan
+    PRIVATE $<$<CONFIG:Debug>:RENDY_VK_DEBUG>
+)
 target_include_directories(
     rendy_vulkan
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
