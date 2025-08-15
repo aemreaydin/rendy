@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 auto PhysicalDevice::Initialize(Instance &instance) -> vk::Bool32 {
   auto physical_devices =
@@ -31,4 +31,4 @@ void PhysicalDevice::queryDeviceInfo() {
   _vk_queue_family_properties = _vk_physical_device.getQueueFamilyProperties();
 }
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

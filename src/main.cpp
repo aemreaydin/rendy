@@ -24,7 +24,7 @@ auto main() -> int {
     return 1;
   }
 
-  auto renderer = rendy::renderer::vulkan::Renderer();
+  auto renderer = rendy::gfx::vulkan::Renderer();
   renderer.Initialize();
 
   bool quit_app = false;

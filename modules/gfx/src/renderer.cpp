@@ -7,7 +7,7 @@
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 void Renderer::Initialize() {
   uint32_t sdl_instance_extension_count{0};
@@ -22,4 +22,4 @@ void Renderer::Initialize() {
 
 void Renderer::Destroy() { _instance->Destroy(); }
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

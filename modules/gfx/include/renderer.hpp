@@ -3,7 +3,7 @@
 #include "instance.hpp"
 #include <memory>
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 class Renderer {
   std::unique_ptr<Instance> _instance;
@@ -13,4 +13,4 @@ public:
   void Destroy();
 };
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

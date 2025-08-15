@@ -2,7 +2,7 @@
 
 #include "vulkan/vulkan.hpp"
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 class PhysicalDevice {
   vk::PhysicalDevice _vk_physical_device;
@@ -20,4 +20,4 @@ public:
   [[nodiscard]] auto Get() const -> vk::PhysicalDevice;
 };
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

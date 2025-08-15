@@ -87,7 +87,7 @@ message(STATUS "Found magic_enum: ${magic_enum_INCLUDE_DIRS}")
 
 # add_subdirectory(modules/common)
 # add_subdirectory(modules/engine_core)
-add_subdirectory(modules/renderer)
+add_subdirectory(modules/gfx)
 # add_subdirectory(modules/game_logic) # This is a hot-reloadable example
 add_subdirectory(src)
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 class Instance {
   uint32_t _vk_api_version{0};
@@ -25,4 +25,4 @@ public:
   [[nodiscard]] auto Get() const -> vk::Instance;
 };
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

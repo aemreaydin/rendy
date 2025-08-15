@@ -45,7 +45,7 @@ VKAPI_ATTR static auto VKAPI_CALL DebugCallback(vk::DebugUtilsMessageSeverityFla
   }
   return vk::False;
 }
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 #ifdef RENDY_VK_DEBUG
 constexpr bool kRendyDebug = true;
@@ -190,4 +190,4 @@ auto Instance::validateLayers(const std::vector<const char *> &required_layers) 
 
 auto Instance::Get() const -> vk::Instance { return _vk_instance; }
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan

@@ -35,7 +35,7 @@ tasks:
     deps: [conan-install]
     sources:
       - CMakeLists.txt
-      - modules/renderer/CMakeLists.txt
+      - modules/gfx/CMakeLists.txt
       - src/CMakeLists.txt
       - '{{.BUILD_DIR}}/generators/conan_toolchain.cmake'
     generates:
@@ -50,8 +50,8 @@ tasks:
     desc: "Build shared libraries"
     deps: [cmake-configure]
     sources:
-      - modules/renderer/include/**/*.hpp
-      - modules/renderer/src/**/*.cpp
+      - modules/gfx/include/**/*.hpp
+      - modules/gfx/src/**/*.cpp
       - '{{.BUILD_DIR}}/CMakeCache.txt'
     generates:
       - '{{.BUILD_DIR}}/lib/librendy_vulkan.dylib'

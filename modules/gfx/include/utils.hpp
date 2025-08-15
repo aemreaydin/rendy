@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
 
-namespace rendy::renderer::vulkan {
+namespace rendy::gfx::vulkan {
 
 template <typename T>
 [[nodiscard]] inline auto VkCheckAndUnwrap(const vk::ResultValue<T>& result_value, std::string_view error_message) -> T {
@@ -13,4 +13,4 @@ template <typename T>
   return result_value.value;
 }
 
-} // namespace rendy::renderer::vulkan
+} // namespace rendy::gfx::vulkan
