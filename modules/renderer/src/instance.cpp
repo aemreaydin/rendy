@@ -1,8 +1,10 @@
 #include "instance.hpp"
+#include "utils.hpp"
 #include <algorithm>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
 #include <vector>
+#include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_enums.hpp>
 #include <vulkan/vulkan_handles.hpp>
 
@@ -117,12 +119,7 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> vk:
       .ppEnabledExtensionNames = required_extensions.data(),
   };
 
-  vk::Result result{};
-  std::tie(result, _vk_instance) = vk::createInstance(instance_create_info, nullptr);
-  if (result != vk::Result::eSuccess) {
-    spdlog::error("Failed to create Vulkan instance({}).", vk::to_string(result));
-    return vk::False;
-  }
+  _vk_instance = VkCheckAndUnwrap(vk::createInstance(instance_create_info, nullptr), "Failed to create instance.");
   VULKAN_HPP_DEFAULT_DISPATCHER.init(_vk_instance);
   spdlog::info("Vulkan instance created.");
 
@@ -156,21 +153,15 @@ void Instance::createDebugUtilsMessengerCreateInfo() {
 }
 
 auto Instance::initializeDebugUtilsMessenger() -> vk::Bool32 {
-  vk::Result result{};
-  std::tie(result, _vk_debug_utils_messenger) =
-      _vk_instance.createDebugUtilsMessengerEXT(_vk_debug_utils_messenger_create_info);
-  if (result != vk::Result::eSuccess) {
-    spdlog::error("Failed to create vk::DebugUtilsMessengerEXT - {}", vk::to_string(result));
-    return vk::False;
-  }
+  _vk_debug_utils_messenger =
+      VkCheckAndUnwrap(_vk_instance.createDebugUtilsMessengerEXT(_vk_debug_utils_messenger_create_info),
+                       "Failed to create DebugUtilsMessengerEXT");
   return vk::True;
 }
 
 auto Instance::validateExtensions(const std::vector<const char *> &required_extensions) -> bool {
-  auto [result, available_extensions] = vk::enumerateInstanceExtensionProperties();
-  if (result != vk::Result::eSuccess) {
-    return false;
-  }
+  auto available_extensions = VkCheckAndUnwrap(vk::enumerateInstanceExtensionProperties(),
+                                               "Failed to enumerate instance extension properties.");
 
   return std::ranges::all_of(required_extensions, [&](const char *extension_name) {
     const auto iter = std::ranges::find(available_extensions, std::string_view(extension_name),
@@ -184,13 +175,13 @@ auto Instance::validateExtensions(const std::vector<const char *> &required_exte
 }
 
 auto Instance::validateLayers(const std::vector<const char *> &required_layers) -> bool {
-  auto [result, available_layers] = vk::enumerateInstanceLayerProperties();
+  auto available_layers =
+      VkCheckAndUnwrap(vk::enumerateInstanceLayerProperties(), "Failed to enumerate instance layer properties");
 
   return std::ranges::all_of(required_layers, [&](const char *layer_name) {
     auto iter = std::ranges::find(available_layers, std::string_view(layer_name), &VkLayerProperties::layerName);
     if (iter == available_layers.end()) {
       spdlog::warn("Layer {} not supported by this device.", iter->layerName);
-
       return false;
     }
     return true;

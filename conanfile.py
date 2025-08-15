@@ -26,7 +26,8 @@ class RendyEngineConan(ConanFile):
         "imgui/1.92.0-docking", 
         "magic_enum/0.9.7",
         "nlohmann_json/3.12.0",
-        "yaml-cpp/0.8.0"
+        "yaml-cpp/0.8.0",
+        "spdlog/1.15.3"
     )
 
     generators = "CMakeDeps", "CMakeToolchain"

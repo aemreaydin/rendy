@@ -1,4 +1,10 @@
-add_library(rendy_vulkan SHARED src/renderer.cpp src/instance.cpp)
+add_library(
+    rendy_vulkan
+    SHARED
+    src/renderer.cpp
+    src/instance.cpp
+    src/physical_device.cpp
+)
 
 target_compile_definitions(
     rendy_vulkan

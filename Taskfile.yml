@@ -1,0 +1,175 @@
+version: '3'
+
+vars:
+  BUILD_TYPE: '{{.BUILD_TYPE | default "Debug"}}'
+  BUILD_DIR: 'build/{{.BUILD_TYPE}}'
+  BIN_DIR: '{{.BUILD_DIR}}/bin'
+  CONAN_PROFILE: '{{if eq .BUILD_TYPE "Debug"}}Debug{{else}}Release{{end}}'
+
+tasks:
+  default:
+    desc: "Build and run the application"
+    deps: [build]
+    cmds:
+      - task: run
+
+  clean:
+    desc: "Clean build artifacts"
+    cmds:
+      - rm -rf build/
+      - rm -f CMakeUserPresets.json
+      - rm -f compile_commands.json
+
+  conan-install:
+    desc: "Install Conan dependencies"
+    sources:
+      - conanfile.py
+    generates:
+      - '{{.BUILD_DIR}}/generators/conan_toolchain.cmake'
+      - '{{.BUILD_DIR}}/generators/CMakePresets.json'
+    cmds:
+      - conan install . --build=missing -s build_type={{.BUILD_TYPE}}
+
+  cmake-configure:
+    desc: "Configure CMake"
+    deps: [conan-install]
+    sources:
+      - CMakeLists.txt
+      - modules/renderer/CMakeLists.txt
+      - src/CMakeLists.txt
+      - '{{.BUILD_DIR}}/generators/conan_toolchain.cmake'
+    generates:
+      - '{{.BUILD_DIR}}/CMakeCache.txt'
+      - '{{.BUILD_DIR}}/Makefile'
+      - compile_commands.json
+    cmds:
+      - cmake --preset conan-{{.CONAN_PROFILE | lower}}
+      - ln -sf {{.BUILD_DIR}}/compile_commands.json compile_commands.json
+
+  build-libs:
+    desc: "Build shared libraries"
+    deps: [cmake-configure]
+    sources:
+      - modules/renderer/include/**/*.hpp
+      - modules/renderer/src/**/*.cpp
+      - '{{.BUILD_DIR}}/CMakeCache.txt'
+    generates:
+      - '{{.BUILD_DIR}}/lib/librendy_vulkan.dylib'
+    cmds:
+      - cmake --build {{.BUILD_DIR}} --target rendy_vulkan --parallel
+
+  build-exe:
+    desc: "Build main executable"
+    deps: [build-libs]
+    sources:
+      - src/**/*.cpp
+      - src/**/*.hpp
+      - '{{.BUILD_DIR}}/lib/librendy_vulkan.dylib'
+    generates:
+      - '{{.BIN_DIR}}/rendy'
+    cmds:
+      - cmake --build {{.BUILD_DIR}} --target rendy --parallel
+
+  copy-assets:
+    desc: "Copy assets and shaders to executable directory"
+    sources:
+      - assets/**/*
+    generates:
+      - '{{.BIN_DIR}}/assets/triangle.slang'
+    cmds:
+      - mkdir -p {{.BIN_DIR}}/assets
+      - cp -r assets/* {{.BIN_DIR}}/assets/
+
+  build:
+    desc: "Build the complete application"
+    deps: [build-exe, copy-assets]
+
+  run:
+    desc: "Run the application"
+    deps: [build]
+    dir: '{{.BUILD_DIR}}'
+    cmds:
+      - ./bin/rendy
+
+  debug:
+    desc: "Build and run in debug mode"
+    cmds:
+      - task: build
+        vars:
+          BUILD_TYPE: Debug
+      - task: run
+        vars:
+          BUILD_TYPE: Debug
+
+  release:
+    desc: "Build and run in release mode"
+    cmds:
+      - task: build
+        vars:
+          BUILD_TYPE: Release
+      - task: run
+        vars:
+          BUILD_TYPE: Release
+
+  format:
+    desc: "Format C++ code"
+    cmds:
+      - find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format -i
+
+  dev:
+    desc: "Development build with sanitizers and analysis tools"
+    vars:
+      BUILD_TYPE: Debug
+    cmds:
+      - task: conan-install
+        vars:
+          BUILD_TYPE: Debug
+      - cmake --preset conan-debug -DSANITIZE_ADDRESS=ON -DENABLE_CLANG_TIDY=ON
+      - task: build-libs
+        vars:
+          BUILD_TYPE: Debug
+      - task: build-exe
+        vars:
+          BUILD_TYPE: Debug
+      - task: copy-assets
+        vars:
+          BUILD_TYPE: Debug
+
+  install-deps:
+    desc: "Install system dependencies (Task runner)"
+    cmds:
+      - |
+        if ! command -v task &> /dev/null; then
+          echo "Installing Task runner..."
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            brew install go-task/tap/go-task
+          elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+          fi
+        else
+          echo "Task runner already installed"
+        fi
+
+  help:
+    desc: "Show available tasks"
+    silent: true
+    cmds:
+      - echo "Available tasks:"
+      - echo "  default     - Build and run the application (debug mode)"
+      - echo "  clean       - Clean all build artifacts"
+      - echo "  build       - Build the complete application"
+      - echo "  run         - Run the application"
+      - echo "  debug       - Build and run in debug mode"
+      - echo "  release     - Build and run in release mode"
+      - echo "  dev         - Development build with sanitizers"
+      - echo "  format      - Format C++ code with clang-format"
+      - echo "  help        - Show this help message"
+      - echo ""
+      - echo "Variables:"
+      - echo "  BUILD_TYPE  - Set to Debug or Release (default Debug)"
+      - echo ""
+      - echo "Examples:"
+      - echo "  task"
+      - echo "  task release"
+      - echo "  task BUILD_TYPE=Release build"
+      - echo "  task dev"

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.30)
 project(rendy CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -54,8 +54,13 @@ option(ENABLE_CLANG_TIDY "Enable Clang-Tidy analysis during build" OFF)
 if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY)
-        set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY} -p=${CMAKE_BINARY_DIR})
-        message(STATUS "Clang-Tidy enabled.")
+        # Only analyze project source files, not external libraries
+        set(CMAKE_CXX_CLANG_TIDY
+            ${CLANG_TIDY}
+            --config-file=${CMAKE_SOURCE_DIR}/.clang-tidy
+            --system-headers=false
+        )
+        message(STATUS "Clang-Tidy enabled (analyzing only project files).")
     else()
         message(
             WARNING
