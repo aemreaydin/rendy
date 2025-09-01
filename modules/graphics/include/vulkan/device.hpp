@@ -1,21 +1,31 @@
 #pragma once
 
 #include "core/device.hpp"
-#include "physical_device.hpp"
-#include "vulkan/vulkan.hpp"
+#include "vulkan/queue.hpp"
+#include <map>
+#include <vulkan/vulkan.hpp>
 
 namespace rendy::graphics::vulkan {
-class Instance;
 class PhysicalDevice;
-
 class VulkanDevice final : public core::Device {
   vk::Device _device;
+  core::DeviceCapabilities _device_capabilities{};
+  std::shared_ptr<PhysicalDevice> _physical_device;
+  QueueRegistry _queue_registry;
+
+  // Queue handles mapped by type
+  std::map<core::QueueType, vk::Queue> _queues;
+
 public:
-  VulkanDevice(const PhysicalDevice& physical_device);
+  VulkanDevice(std::shared_ptr<PhysicalDevice> physical_device);
 
   auto GetGraphicsAPI() -> core::GraphicsAPI override;
-  void Initialize() override;
+  auto Initialize() -> bool override;
   void Cleanup() override;
+
+  // Queue access
+  [[nodiscard]] auto GetQueue(core::QueueType type) const -> vk::Queue;
+  [[nodiscard]] auto GetQueueRegistry() const -> const QueueRegistry & { return _queue_registry; }
 };
 
 } // namespace rendy::graphics::vulkan

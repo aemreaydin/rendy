@@ -13,7 +13,7 @@ target_link_libraries(
     PRIVATE
         # common
         # engine_core
-        rendy_vulkan
+        rendy_graphics
         spdlog::spdlog
         SDL3::SDL3 # Link SDL3 from Conan
         imgui::imgui # Link ImGui from Conan
@@ -24,7 +24,7 @@ target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/modules/renderer/include
+        ${CMAKE_SOURCE_DIR}/modules/graphics/include
     # ${CMAKE_SOURCE_DIR}/modules/common/include
     # ${CMAKE_SOURCE_DIR}/modules/engine_core/include
     # ${CMAKE_SOURCE_DIR}/modules/game_logic/include

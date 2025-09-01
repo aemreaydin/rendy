@@ -7,6 +7,7 @@ add_library(
     src/core/texture.cpp
     src/core/pipeline.cpp
     src/core/command_list.cpp
+    src/vulkan/queue.cpp
     src/vulkan/device.cpp
     src/vulkan/instance.cpp
     src/vulkan/physical_device.cpp

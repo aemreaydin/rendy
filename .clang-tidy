@@ -21,11 +21,8 @@ Checks: >
   -llvm-header-guard,
   -hicpp-signed-bitwise,
 
-# Only analyze headers in our project directories (not external libraries)
 HeaderFilterRegex: '^.*(modules|src)/.*\.(h|hpp)$'
-
-# Re-enable warnings as errors once code is clean
-# WarningsAsErrors: "*"
+WarningsAsErrors: "*"
 
 CheckOptions:
   - key:             readability-identifier-naming.ClassCase
@@ -40,8 +37,6 @@ CheckOptions:
     value:           CamelCase
   - key:             readability-identifier-naming.EnumConstantCase
     value:           CamelCase
-  - key:             readability-identifier-naming.EnumConstantPrefix
-    value:           k
   - key:             readability-identifier-naming.FunctionCase
     value:           CamelCase
   - key:             readability-identifier-naming.GlobalConstantCase

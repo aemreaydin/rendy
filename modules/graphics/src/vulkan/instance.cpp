@@ -7,6 +7,7 @@
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_enums.hpp>
 #include <vulkan/vulkan_handles.hpp>
+#include <vulkan/vulkan_structs.hpp>
 
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
@@ -88,11 +89,19 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> boo
   std::vector<const char *> required_layers;
   void *p_next = nullptr;
   if (kRendyDebug) {
+    createDebugUtilsMessengerCreateInfo();
+    std::vector<vk::ValidationFeatureEnableEXT> validation_feature_enables = {
+        vk::ValidationFeatureEnableEXT::eDebugPrintf};
+
+    vk::ValidationFeaturesEXT validation_features{
+        .pNext = &_vk_debug_utils_messenger_create_info,
+        .enabledValidationFeatureCount = VkToU32(validation_feature_enables.size()),
+        .pEnabledValidationFeatures = validation_feature_enables.data(),
+    };
     spdlog::info("This is a debug build. Validation Layers are enabled.");
     required_extensions.emplace_back(vk::EXTDebugUtilsExtensionName);
     required_layers.emplace_back(kValidationLayer);
-    createDebugUtilsMessengerCreateInfo();
-    p_next = &_vk_debug_utils_messenger_create_info;
+    p_next = &validation_features;
   }
 
   if (!validateExtensions(required_extensions) || !validateLayers(required_layers)) {

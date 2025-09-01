@@ -4,6 +4,10 @@
 
 namespace rendy::graphics::core {
 
+struct DeviceCapabilities {
+  bool compute_support{false};
+};
+
 class Device {
 public:
   Device() = default;
@@ -15,7 +19,7 @@ public:
 
   virtual auto GetGraphicsAPI() -> GraphicsAPI = 0;
 
-  virtual void Initialize() = 0;
+  virtual auto Initialize() -> bool = 0;
   virtual void Cleanup() = 0;
 };
 

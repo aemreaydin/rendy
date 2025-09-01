@@ -1,4 +1,4 @@
-#include "renderer.hpp"
+#include "vulkan/renderer.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <spdlog/fmt/ranges.h>
@@ -24,8 +24,8 @@ auto main() -> int {
     return 1;
   }
 
-  auto renderer = rendy::gfx::vulkan::Renderer();
-  renderer.Initialize();
+  auto renderer = rendy::graphics::vulkan::Renderer();
+  renderer.Initialize(*sdl_window);
 
   bool quit_app = false;
   while (!quit_app) {
