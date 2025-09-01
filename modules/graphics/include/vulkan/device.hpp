@@ -3,6 +3,7 @@
 #include "core/device.hpp"
 #include "vulkan/queue.hpp"
 #include <map>
+#include <memory>
 #include <vulkan/vulkan.hpp>
 
 namespace rendy::graphics::vulkan {

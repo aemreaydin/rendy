@@ -7,3 +7,5 @@ backlog
 .task
 plan.md
 CLAUDE.md
+.idea
+conan_provider.cmake

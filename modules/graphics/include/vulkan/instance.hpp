@@ -3,6 +3,7 @@
 #include <span>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_structs.hpp>
 
 namespace rendy::graphics::vulkan {
 

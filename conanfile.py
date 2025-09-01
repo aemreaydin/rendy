@@ -18,11 +18,12 @@ class RendyEngineConan(ConanFile):
         "shared": True, 
         "fPIC": True, 
         "sdl/*:shared": True, 
+        "sdl/*:pulseaudio": False,
         "imgui/*:shared": True, 
     }
 
     requires = (
-        "sdl/3.2.14",
+        "sdl/3.2.20",
         "imgui/1.92.0-docking", 
         "magic_enum/0.9.7",
         "nlohmann_json/3.12.0",

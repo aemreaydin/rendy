@@ -55,10 +55,10 @@ constexpr bool kRendyDebug = true;
 constexpr bool kRendyDebug = false;
 #endif
 
-constexpr const char *kAppName = "Rendy";
-constexpr const char *kEngineName = "Rendy Engine";
+constexpr auto kAppName = "Rendy";
+constexpr auto kEngineName = "Rendy Engine";
 
-constexpr const char *kValidationLayer = "VK_LAYER_KHRONOS_validation";
+constexpr auto kValidationLayer = "VK_LAYER_KHRONOS_validation";
 
 auto Instance::Initialize(std::span<const char *const> window_extensions) -> bool {
   VULKAN_HPP_DEFAULT_DISPATCHER.init();
@@ -87,23 +87,20 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> boo
   required_extensions.assign(window_extensions.begin(), window_extensions.end());
 
   std::vector<const char *> required_layers;
-  void *p_next = nullptr;
+  void  const*p_next = nullptr;
   if (kRendyDebug) {
-    createDebugUtilsMessengerCreateInfo();
-    std::vector<vk::ValidationFeatureEnableEXT> validation_feature_enables = {
-        vk::ValidationFeatureEnableEXT::eDebugPrintf};
-
-    vk::ValidationFeaturesEXT validation_features{
-        .pNext = &_vk_debug_utils_messenger_create_info,
-        .enabledValidationFeatureCount = VkToU32(validation_feature_enables.size()),
-        .pEnabledValidationFeatures = validation_feature_enables.data(),
-    };
     spdlog::info("This is a debug build. Validation Layers are enabled.");
+    createDebugUtilsMessengerCreateInfo();
+
     required_extensions.emplace_back(vk::EXTDebugUtilsExtensionName);
     required_layers.emplace_back(kValidationLayer);
-    p_next = &validation_features;
+
+    p_next = &_vk_debug_utils_messenger_create_info;
   }
 
+  for (const auto& layer : required_layers) {
+    spdlog::info("{}", std::string_view(layer));
+  }
   if (!validateExtensions(required_extensions) || !validateLayers(required_layers)) {
     spdlog::error("Some of the extensions and/or layers are not supported by this device.");
     return false;
@@ -171,7 +168,7 @@ auto Instance::validateExtensions(const std::vector<const char *> &required_exte
     const auto iter = std::ranges::find(available_extensions, std::string_view(extension_name),
                                         &VkExtensionProperties::extensionName);
     if (iter == available_extensions.end()) {
-      spdlog::warn("Extension {} not supported by this device.", iter->extensionName);
+      spdlog::warn("Extension {} not supported by this device.", std::string_view(iter->extensionName));
       return false;
     }
     return true;
@@ -182,10 +179,11 @@ auto Instance::validateLayers(const std::vector<const char *> &required_layers) 
   auto available_layers =
       VkCheckAndUnwrap(vk::enumerateInstanceLayerProperties(), "Failed to enumerate instance layer properties");
 
+  for (const auto& layer_name : required_layers) { spdlog::warn("Required layer {}", layer_name); }
   return std::ranges::all_of(required_layers, [&](const char *layer_name) {
-    auto iter = std::ranges::find(available_layers, std::string_view(layer_name), &VkLayerProperties::layerName);
+    const auto iter = std::ranges::find(available_layers, std::string_view(layer_name), &VkLayerProperties::layerName);
     if (iter == available_layers.end()) {
-      spdlog::warn("Layer {} not supported by this device.", iter->layerName);
+      spdlog::warn("Layer {} not supported by this device.", std::string_view(iter->layerName));
       return false;
     }
     return true;
