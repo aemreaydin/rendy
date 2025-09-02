@@ -74,7 +74,7 @@ auto QueueRegistry::GetFamilyFor(core::QueueType type) const -> uint32_t {
   }
 
   if (!found_any) {
-    spdlog::error("No queue family found for requested type");
+    // spdlog::error("No queue family found for requested type");
     return _families.begin()->first; // Return first available family as last resort
   }
 

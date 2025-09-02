@@ -35,6 +35,7 @@ target_compile_definitions(
         VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
         VULKAN_HPP_NO_CONSTRUCTORS
         VULKAN_HPP_NO_EXCEPTIONS
+        GLFW_INCLUDE_VULKAN
 )
 target_compile_definitions(
     rendy_graphics
@@ -43,13 +44,13 @@ target_compile_definitions(
 
 find_package(Vulkan REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(SDL3 REQUIRED)
+find_package(glfw3 REQUIRED)
 
 # Link dependencies
 target_link_libraries(
     rendy_graphics
     PUBLIC
-    PRIVATE Vulkan::Vulkan spdlog::spdlog SDL3::SDL3
+    PRIVATE Vulkan::Vulkan spdlog::spdlog  glfw
 )
 
 if(MSVC)

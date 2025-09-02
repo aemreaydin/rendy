@@ -14,8 +14,8 @@ target_link_libraries(
         # common
         # engine_core
         rendy_graphics
+        glfw
         spdlog::spdlog
-        SDL3::SDL3 # Link SDL3 from Conan
         imgui::imgui # Link ImGui from Conan
         Vulkan::Vulkan # Link Vulkan
 )

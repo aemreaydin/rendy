@@ -1,6 +1,5 @@
 #include "vulkan/renderer.hpp"
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_vulkan.h>
+#include <GLFW/glfw3.h>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
@@ -8,41 +7,45 @@
 constexpr int kWidth = 800;
 constexpr int kHeight = 600;
 
+static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+  }
+}
+
 auto main() -> int {
   spdlog::set_level(spdlog::level::level_enum::trace);
   spdlog::info("Starting Rendy...");
 
-  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-    spdlog::error("SDL could not initialize! SDL_ERROR: {}", SDL_GetError());
+  if (glfwInit() == GLFW_FALSE) {
+    const char *error{};
+    glfwGetError(&error);
+    spdlog::error("GLFW could not initialize! GLFW Error: {}", error);
     return 1;
   }
 
-  auto *sdl_window = SDL_CreateWindow("Vulkan Engine", kWidth, kHeight, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
-  if (sdl_window == nullptr) {
-    spdlog::error("Window could not be created! SDL_Error: {}", SDL_GetError());
-    SDL_Quit();
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  auto *glfw_window = glfwCreateWindow(kWidth, kHeight, "Rendy", nullptr, nullptr);
+  if (glfw_window == nullptr) {
+    const char *error{};
+    glfwGetError(&error);
+    spdlog::error("Window could not be created! GLFW Error: {}", error);
     return 1;
   }
+  glfwSetKeyCallback(glfw_window, KeyCallback);
 
   auto renderer = rendy::graphics::vulkan::Renderer();
-  renderer.Initialize(*sdl_window);
+  renderer.Initialize(*glfw_window);
 
   bool quit_app = false;
-  while (!quit_app) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_EVENT_KEY_DOWN) {
-        if (event.key.key == SDLK_ESCAPE) {
-          quit_app = true;
-        }
-      }
-    }
+  while (glfwWindowShouldClose(glfw_window) == GLFW_FALSE) {
+    glfwPollEvents();
   }
 
   renderer.Destroy();
 
-  SDL_DestroyWindow(sdl_window);
-  SDL_Quit();
+  glfwDestroyWindow(glfw_window);
+  glfwTerminate();
 
   spdlog::info("Rendy Shutting Down...");
   return 0;

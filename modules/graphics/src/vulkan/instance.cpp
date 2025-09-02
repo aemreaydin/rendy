@@ -87,7 +87,7 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> boo
   required_extensions.assign(window_extensions.begin(), window_extensions.end());
 
   std::vector<const char *> required_layers;
-  void  const*p_next = nullptr;
+  void const *p_next = nullptr;
   if (kRendyDebug) {
     spdlog::info("This is a debug build. Validation Layers are enabled.");
     createDebugUtilsMessengerCreateInfo();
@@ -98,7 +98,7 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> boo
     p_next = &_vk_debug_utils_messenger_create_info;
   }
 
-  for (const auto& layer : required_layers) {
+  for (const auto &layer : required_layers) {
     spdlog::info("{}", std::string_view(layer));
   }
   if (!validateExtensions(required_extensions) || !validateLayers(required_layers)) {
@@ -179,7 +179,9 @@ auto Instance::validateLayers(const std::vector<const char *> &required_layers) 
   auto available_layers =
       VkCheckAndUnwrap(vk::enumerateInstanceLayerProperties(), "Failed to enumerate instance layer properties");
 
-  for (const auto& layer_name : required_layers) { spdlog::warn("Required layer {}", layer_name); }
+  for (const auto &layer_name : required_layers) {
+    spdlog::warn("Required layer {}", layer_name);
+  }
   return std::ranges::all_of(required_layers, [&](const char *layer_name) {
     const auto iter = std::ranges::find(available_layers, std::string_view(layer_name), &VkLayerProperties::layerName);
     if (iter == available_layers.end()) {

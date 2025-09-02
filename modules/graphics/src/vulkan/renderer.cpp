@@ -2,34 +2,35 @@
 #include "vulkan/device.hpp"
 #include "vulkan/instance.hpp"
 
-#include <SDL3/SDL_error.h>
 #include <memory>
 #include <span>
 #include <spdlog/spdlog.h>
 #include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace rendy::graphics::vulkan {
 
-void Renderer::Initialize(SDL_Window &window) {
-  uint32_t sdl_instance_extension_count{0};
-  const auto *sdl_instance_extensions = SDL_Vulkan_GetInstanceExtensions(&sdl_instance_extension_count);
-  const auto sdl_instance_extensions_span = std::span{sdl_instance_extensions, sdl_instance_extension_count};
+void Renderer::Initialize(GLFWwindow &window) {
+  if (glfwVulkanSupported() == GLFW_FALSE) {
+    throw std::runtime_error("Glfw Vulkan support not found.");
+  }
+
+  uint32_t glfw_instance_extensions_count{};
+  const auto *glfw_instance_extensions = glfwGetRequiredInstanceExtensions(&glfw_instance_extensions_count);
+  const auto glfw_instance_extensions_span = std::span{glfw_instance_extensions, glfw_instance_extensions_count};
 
   _instance = std::make_unique<Instance>();
-  if (!_instance->Initialize(sdl_instance_extensions_span)) {
+  if (!_instance->Initialize(glfw_instance_extensions_span)) {
     throw std::runtime_error("Failed to create Vulkan instance.");
   }
-  VkSurfaceKHR vk_surface{};
-  if (!SDL_Vulkan_CreateSurface(&window, _instance->Get(), nullptr, &vk_surface)) {
-    const char* sdl_error = SDL_GetError();
-    spdlog::error("SDL_Vulkan_CreateSurface failed: {}", sdl_error ? sdl_error : "Unknown error");
+  VkSurfaceKHR surface{};
+  if (glfwCreateWindowSurface(_instance->Get(), &window, nullptr, &surface) != VK_SUCCESS) {
+    const char *error{};
+    glfwGetError(&error);
+    spdlog::error("Window could not be created! GLFW Error: {}", error);
     throw std::runtime_error("Failed to create Vulkan surface.");
   }
-  spdlog::debug("SDL created VkSurfaceKHR: {}", reinterpret_cast<void*>(vk_surface));
-  
-  // Properly convert VkSurfaceKHR to vk::SurfaceKHR
-  vk::SurfaceKHR cpp_surface{vk_surface};
-  _surface = std::make_unique<vk::SurfaceKHR>(cpp_surface);
+  _surface = std::make_unique<vk::SurfaceKHR>(surface);
   _physical_device = std::make_unique<PhysicalDevice>();
   if (!_physical_device->Initialize(*_instance, *_surface)) {
     throw std::runtime_error("Failed to choose a valid Vulkan physical device.");
@@ -43,6 +44,7 @@ void Renderer::Initialize(SDL_Window &window) {
 }
 
 void Renderer::Destroy() {
+  _device->Cleanup();
   _instance->Get().destroySurfaceKHR(*_surface);
   _instance->Destroy();
 }
