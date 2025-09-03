@@ -135,29 +135,22 @@ auto PhysicalDevice::querySwapChainSupport(vk::PhysicalDevice device, vk::Surfac
   spdlog::info("Querying Device Capabilities");
   spdlog::debug("Physical device handle: {}", reinterpret_cast<void*>(static_cast<VkPhysicalDevice>(device)));
   spdlog::debug("Surface handle: {}", reinterpret_cast<void*>(static_cast<VkSurfaceKHR>(surface)));
-  
+
   // First check if device supports presentation on any queue family for this surface
   bool presentation_supported = false;
   auto queue_families = device.getQueueFamilyProperties();
   for (uint32_t i = 0; i < queue_families.size(); i++) {
-    try {
-      auto support_result = device.getSurfaceSupportKHR(i, surface);
-      if (support_result.result == vk::Result::eSuccess && support_result.value) {
-        presentation_supported = true;
-        spdlog::debug("Queue family {} supports presentation", i);
-        break;
-      }
-    } catch (...) {
-      spdlog::debug("Failed to check presentation support for queue family {}", i);
-      continue;
+    if (VkCheckAndUnwrap(device.getSurfaceSupportKHR(i, surface), "Failed to get surface support") == vk::True) {
+      presentation_supported = true;
+      spdlog::debug("Queue family {} supports presentation", i);
     }
   }
-  
+
   if (!presentation_supported) {
     spdlog::warn("Physical device doesn't support presentation for this surface");
     return details; // Return empty details
   }
-  
+
   details.capabilities =
       VkCheckAndUnwrap(device.getSurfaceCapabilitiesKHR(surface), "Failed to get surface capabilities");
 
