@@ -4,8 +4,8 @@ vars:
   BUILD_TYPE: '{{.BUILD_TYPE | default "Debug"}}'
   BUILD_DIR: 'build/{{.BUILD_TYPE}}'
   BIN_DIR: '{{.BUILD_DIR}}/bin'
-  LIB_EXT: '{{if eq .OS "Windows_NT"}}.lib{{else if eq .OS "darwin"}}.dylib{{else}}.so{{end}}'
-  PRESET_OS: '{{if eq .OS "Windows_NT"}}windows{{else if eq .OS "darwin"}}macos{{else}}linux{{end}}'
+  LIB_EXT: '{{if eq OS "windows"}}.lib{{else if eq OS "darwin"}}.dylib{{else}}.so{{end}}'
+  PRESET_OS: '{{if eq OS "windows"}}windows{{else if eq OS "darwin"}}macos{{else}}linux{{end}}'
 
 tasks:
   default:
