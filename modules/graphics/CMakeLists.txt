@@ -37,20 +37,20 @@ target_compile_definitions(
         VULKAN_HPP_NO_EXCEPTIONS
         GLFW_INCLUDE_VULKAN
 )
+if(MSVC)
+    target_compile_definitions(rendy_graphics PRIVATE RENDY_GRAPHICS_EXPORTS)
+endif()
+
 target_compile_definitions(
     rendy_graphics
     PRIVATE $<$<CONFIG:Debug>:RENDY_VK_DEBUG>
 )
 
-find_package(Vulkan REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(glfw3 REQUIRED)
-
 # Link dependencies
 target_link_libraries(
     rendy_graphics
     PUBLIC
-    PRIVATE Vulkan::Vulkan spdlog::spdlog  glfw
+    PRIVATE Vulkan::Vulkan spdlog::spdlog glfw
 )
 
 if(MSVC)
@@ -58,3 +58,10 @@ if(MSVC)
 else()
     target_compile_options(rendy_graphics PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
+# Install the library
+install(TARGETS rendy_graphics
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)

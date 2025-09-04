@@ -8,7 +8,7 @@
 
 namespace rendy::graphics::vulkan {
 class PhysicalDevice;
-class VulkanDevice final : public core::Device {
+class RENDY_API VulkanDevice final : public core::Device {
   vk::Device _device;
   core::DeviceCapabilities _device_capabilities{};
   std::shared_ptr<PhysicalDevice> _physical_device;
@@ -18,7 +18,7 @@ class VulkanDevice final : public core::Device {
   std::map<core::QueueType, vk::Queue> _queues;
 
 public:
-  VulkanDevice(std::shared_ptr<PhysicalDevice> physical_device);
+  explicit VulkanDevice(std::shared_ptr<PhysicalDevice> physical_device);
 
   auto GetGraphicsAPI() -> core::GraphicsAPI override;
   auto Initialize() -> bool override;

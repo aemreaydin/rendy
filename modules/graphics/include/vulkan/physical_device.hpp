@@ -6,7 +6,7 @@
 
 namespace rendy::graphics::vulkan {
 
-struct SwapChainSupportDetails {
+struct RENDY_API SwapChainSupportDetails {
   vk::SurfaceCapabilitiesKHR capabilities;
   std::vector<vk::SurfaceFormatKHR> formats;
   std::vector<vk::PresentModeKHR> present_modes;
@@ -14,7 +14,7 @@ struct SwapChainSupportDetails {
   [[nodiscard]] auto IsAdequate() const -> bool { return !formats.empty() && !present_modes.empty(); }
 };
 
-class PhysicalDevice {
+class RENDY_API PhysicalDevice {
   vk::PhysicalDevice _vk_physical_device;
   vk::PhysicalDeviceFeatures _vk_features;
   vk::PhysicalDeviceProperties _vk_properties;

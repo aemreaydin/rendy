@@ -9,3 +9,5 @@ plan.md
 CLAUDE.md
 .idea
 conan_provider.cmake
+.vs
+.vscode

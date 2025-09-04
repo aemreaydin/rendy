@@ -37,7 +37,7 @@ class RendyEngineConan(ConanFile):
             self.options.rm_safe("fPIC")
 
     def layout(self):
-        cmake_layout(self)
+        self.folders.generators = "generators"
 
     def build(self):
         cmake = CMake(self)

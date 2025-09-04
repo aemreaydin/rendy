@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enums.hpp"
+#include "graphics_api.hpp" 
 
 namespace rendy::graphics::core {
 
@@ -8,7 +9,7 @@ struct DeviceCapabilities {
   bool compute_support{false};
 };
 
-class Device {
+class RENDY_API Device {
 public:
   Device() = default;
   Device(const Device &) = delete;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(rendy CXX)
+project(rendy C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,6 +14,8 @@ option(SANITIZE_ADDRESS "Enable AddressSanitizer (ASan)" OFF)
 option(SANITIZE_UNDEFINED "Enable UndefinedBehaviorSanitizer (UBSan)" OFF)
 option(SANITIZE_LEAK "Enable LeakSanitizer (LSan)" OFF)
 option(SANITIZE_THREAD "Enable ThreadSanitizer (TSan)" OFF)
+
+
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     if(SANITIZE_ADDRESS)
@@ -74,8 +76,7 @@ if(ENABLE_IWYU)
     set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "include-what-you-use;-w;-Xiwyu")
 endif()
 
-find_package(Vulkan REQUIRED)
-message(STATUS "Found Vulkan SDK: ${Vulkan_INCLUDE_DIRS}")
+
 find_package(imgui REQUIRED)
 message(STATUS "Found imgui: ${imgui_INCLUDE_DIRS}")
 find_package(spdlog REQUIRED)
@@ -84,6 +85,8 @@ find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_INCLUDE_DIRS}")
 find_package(glfw3 REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_INCLUDE_DIRS}")
+find_package(Vulkan REQUIRED)
+message(STATUS "Found Vulkan SDK: ${Vulkan_INCLUDE_DIRS}")
 
 # add_subdirectory(modules/common)
 # add_subdirectory(modules/engine_core)

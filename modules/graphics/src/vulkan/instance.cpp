@@ -154,7 +154,7 @@ void Instance::createDebugUtilsMessengerCreateInfo() {
                                            .pUserData = nullptr};
 }
 
-constexpr void Instance::initializeDebugUtilsMessenger() {
+void Instance::initializeDebugUtilsMessenger() {
   _vk_debug_utils_messenger =
       VkCheckAndUnwrap(_vk_instance.createDebugUtilsMessengerEXT(_vk_debug_utils_messenger_create_info),
                        "Failed to create DebugUtilsMessengerEXT");

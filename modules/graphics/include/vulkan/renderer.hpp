@@ -9,7 +9,7 @@
 
 namespace rendy::graphics::vulkan {
 
-class Renderer {
+class RENDY_API Renderer {
   std::unique_ptr<vk::SurfaceKHR> _surface;
   std::unique_ptr<Instance> _instance;
   std::shared_ptr<PhysicalDevice> _physical_device;

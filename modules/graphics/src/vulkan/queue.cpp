@@ -7,7 +7,7 @@ namespace rendy::graphics::vulkan {
 
 void QueueRegistry::RegisterFamily(uint32_t family_index, core::QueueType types, uint32_t count) {
   _families[family_index] =
-      QueueFamilyInfo{.family_index = family_index, .supported_types = types, .queue_count = count};
+      QueueFamilyInfo{.family_index = family_index, .queue_count = count, .supported_types = types};
 
   std::vector<std::string> type_names;
   if (static_cast<uint32_t>(types & core::QueueType::Graphics) != 0) {

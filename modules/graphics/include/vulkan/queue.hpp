@@ -5,19 +5,20 @@
 #include <optional>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include "graphics_api.hpp"
 
 namespace rendy::graphics::vulkan {
 
 struct QueueFamilyIndices {
-  uint32_t graphics_family;                // Required (also handles presentation)
+  uint32_t graphics_family{};                // Required (also handles presentation)
   std::optional<uint32_t> compute_family;  // Optional
   std::optional<uint32_t> transfer_family; // Optional
 };
 
 struct QueueFamilyInfo {
-  uint32_t family_index;
-  core::QueueType supported_types;
-  uint32_t queue_count;
+  uint32_t family_index{};
+  uint32_t queue_count{};
+  core::QueueType supported_types{};
 };
 
 class QueueRegistry {
