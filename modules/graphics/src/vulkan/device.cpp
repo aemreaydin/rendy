@@ -57,16 +57,17 @@ auto VulkanDevice::Initialize() -> bool {
   _device = VkCheckAndUnwrap(_physical_device->Get().createDevice(device_create_info), "Failed to create device.");
 
   // Retrieve queue handles and populate map
-  _queues[core::QueueType::Graphics] = _device.getQueue(_queue_registry.GetFamilyFor(core::QueueType::Graphics), 0);
-
-  // Transfer queue: use dedicated if available, otherwise use graphics queue
-  auto transfer_family = _queue_registry.GetFamilyFor(core::QueueType::Transfer);
-  _queues[core::QueueType::Transfer] = _device.getQueue(transfer_family, 0);
-
-  // Compute queue: only if available
-  if (_device_capabilities.compute_support) {
-    _queues[core::QueueType::Compute] = _device.getQueue(_queue_registry.GetFamilyFor(core::QueueType::Compute), 0);
-  }
+  //
+  // TODO: These are all wrong
+  _queues[core::QueueType::Graphics] = _device.getQueue(0, 0);
+  // _queues[core::QueueType::Graphics] = _device.getQueue(_queue_registry.GetFamilyFor(core::QueueType::Graphics), 0);
+  // // Transfer queue: use dedicated if available, otherwise use graphics queue
+  // auto transfer_family = _queue_registry.GetFamilyFor(core::QueueType::Transfer);
+  // _queues[core::QueueType::Transfer] = _device.getQueue(transfer_family, 0);
+  // // Compute queue: only if available
+  // if (_device_capabilities.compute_support) {
+  //   _queues[core::QueueType::Compute] = _device.getQueue(_queue_registry.GetFamilyFor(core::QueueType::Compute), 0);
+  // }
 
   return true;
 }

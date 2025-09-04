@@ -4,7 +4,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_structs.hpp>
-#include "graphics_api.hpp"
+#include "rendy_api_export.h"
 
 namespace rendy::graphics::vulkan {
 

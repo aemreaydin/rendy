@@ -14,6 +14,13 @@ add_library(
     src/vulkan/renderer.cpp
 )
 
+include(GenerateExportHeader)
+generate_export_header(
+    rendy_graphics
+    BASE_NAME RENDY_API
+    EXPORT_MACRO_NAME RENDY_API
+)
+
 set_target_properties(
     rendy_graphics
     PROPERTIES
@@ -26,6 +33,7 @@ target_include_directories(
     rendy_graphics
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -37,9 +45,6 @@ target_compile_definitions(
         VULKAN_HPP_NO_EXCEPTIONS
         GLFW_INCLUDE_VULKAN
 )
-if(MSVC)
-    target_compile_definitions(rendy_graphics PRIVATE RENDY_GRAPHICS_EXPORTS)
-endif()
 
 target_compile_definitions(
     rendy_graphics
@@ -60,7 +65,8 @@ else()
 endif()
 
 # Install the library
-install(TARGETS rendy_graphics
+install(
+    TARGETS rendy_graphics
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

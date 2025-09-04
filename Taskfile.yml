@@ -54,6 +54,9 @@ tasks:
     - '{{.BUILD_DIR}}/CMakeCache.txt'
     cmds:
     - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
+    - cmd: 'ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json'
+      platforms: [linux, darwin]
+
 
   # CMake Build Steps
   build-libs:

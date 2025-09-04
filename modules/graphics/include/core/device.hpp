@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enums.hpp"
-#include "graphics_api.hpp" 
+#include "rendy_api_export.h" 
 
 namespace rendy::graphics::core {
 
