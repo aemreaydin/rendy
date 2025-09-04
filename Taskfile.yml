@@ -4,7 +4,8 @@ vars:
   BUILD_TYPE: '{{.BUILD_TYPE | default "Debug"}}'
   BUILD_DIR: 'build/{{.BUILD_TYPE}}'
   BIN_DIR: '{{.BUILD_DIR}}/bin'
-  LIB_EXT: '{{if eq .OS "Windows_NT"}}.dll{{else if eq .OS "darwin"}}.dylib{{else}}.so{{end}}'
+  LIB_EXT: '{{if eq .OS "Windows_NT"}}.lib{{else if eq .OS "darwin"}}.dylib{{else}}.so{{end}}'
+  PRESET_OS: '{{if eq .OS "Windows_NT"}}windows{{else if eq .OS "darwin"}}macos{{else}}linux{{end}}'
 
 tasks:
   default:
@@ -52,7 +53,7 @@ tasks:
     generates:
     - '{{.BUILD_DIR}}/CMakeCache.txt'
     cmds:
-    - cmake --preset conan-default
+    - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
 
   # CMake Build Steps
   build-libs:
@@ -64,9 +65,6 @@ tasks:
     generates:
     - '{{.BUILD_DIR}}/lib/{{.BUILD_TYPE}}/rendy_graphics{{.LIB_EXT}}'
     cmds:
-    - pwsh -C 'Write-Host {{.OS}}'
-    - pwsh -C 'Write-Host {{.LIB_EXT}}'
-    - pwsh -C 'Write-Host {{.BUILD_DIR}}/lib/{{.BUILD_TYPE}}/rendy_graphics{{.LIB_EXT}}'
     - cmake --build {{.BUILD_DIR}} --target rendy_graphics --parallel
 
   build-exe:

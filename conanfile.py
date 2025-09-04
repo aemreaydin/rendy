@@ -37,6 +37,7 @@ class RendyEngineConan(ConanFile):
             self.options.rm_safe("fPIC")
 
     def layout(self):
+        self.folders.build_folder_vars = ["settings.os", "settings.build_type"]
         self.folders.generators = "generators"
 
     def build(self):
