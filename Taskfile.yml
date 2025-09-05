@@ -73,14 +73,14 @@ tasks:
       - modules/**/*.hpp
       - modules/**/*.cpp
     generates:
-      - "{{.BUILD_DIR}}/lib/{{.BUILD_TYPE}}/{{.LIB_PREFIX}}rendy_graphics{{.LIB_EXT}}"
+      - "{{.BUILD_DIR}}/lib/{{.LIB_PREFIX}}rendy_graphics{{.LIB_EXT}}"
     cmds:
       - cmake --build {{.BUILD_DIR}} --target rendy_graphics --config {{.BUILD_TYPE}} --parallel
   build-exe:
     desc: "Build main executable"
     vars:
       BUILD_DIR: "build/{{.BUILD_TYPE}}"
-      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin"
     deps:
       - task: build-libs
         vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
@@ -107,7 +107,7 @@ tasks:
       - task: build
         vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
     vars:
-      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin"
     dir: "{{.BIN_DIR}}"
     cmds:
       - cmd: pwsh -c "Start-Process -FilePath 'rendy{{exeExt}}'"
@@ -138,7 +138,7 @@ tasks:
   copy-assets:
     desc: "Copy assets and shaders to executable directory"
     vars:
-      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin"
     sources:
       - assets/**/*
     generates:
