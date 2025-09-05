@@ -1,6 +1,8 @@
 import os
 from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake
+from conan.tools.files import copy
+
 
 class RendyEngineConan(ConanFile):
     name = "rendy_engine"
@@ -15,22 +17,22 @@ class RendyEngineConan(ConanFile):
         "fPIC": [True, False],
     }
     default_options = {
-        "shared": True, 
-        "fPIC": True, 
+        "shared": True,
+        "fPIC": True,
         "glfw/*:shared": True,
-        "imgui/*:shared": True, 
+        "imgui/*:shared": True,
     }
 
     requires = (
         "glfw/3.4",
-        "imgui/1.92.0-docking", 
+        "imgui/1.92.0-docking",
         "magic_enum/0.9.7",
         "nlohmann_json/3.12.0",
         "yaml-cpp/0.8.0",
-        "spdlog/1.15.3"
+        "spdlog/1.15.3",
     )
 
-    generators = "CMakeDeps", "CMakeToolchain"
+    generators = "CMakeDeps", "CMakeToolchain", "VirtualRunEnv"
 
     def config_options(self):
         if self.settings.os == "Windows":

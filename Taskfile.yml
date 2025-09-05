@@ -37,13 +37,14 @@ tasks:
     desc: "Install Conan dependencies"
     vars:
       BUILD_DIR: "build/{{.BUILD_TYPE}}"
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin"
     sources:
       - conanfile.py
     generates:
       - "{{.BUILD_DIR}}/generators/conan_toolchain.cmake"
       - "{{.BUILD_DIR}}/generators/CMakePresets.json"
     cmds:
-      - conan install . --output-folder={{.BUILD_DIR}} --build=missing --settings=build_type={{.BUILD_TYPE}}
+      - conan install . --output-folder={{.BUILD_DIR}} --build=missing --settings=build_type={{.BUILD_TYPE}} --deployer runtime_deploy --deployer-folder {{.BIN_DIR}}
   cmake-configure:
     desc: "Configure CMake"
     deps:
@@ -112,10 +113,7 @@ tasks:
       BIN_DIR: "build/{{.BUILD_TYPE}}/bin"
     dir: "{{.BIN_DIR}}"
     cmds:
-      - cmd: pwsh -c "Start-Process -FilePath 'rendy{{exeExt}}'"
-        platforms: [windows]
-      - cmd: ./rendy{{exeExt}}
-        platforms: [linux, darwin]
+      - cmd: "./rendy{{exeExt}}"
 
   debug:
     desc: "Build and run in debug mode"
@@ -154,6 +152,8 @@ tasks:
       - cmd: mkdir -p {{.BIN_DIR}}/assets && cp -r assets/* {{.BIN_DIR}}/assets/
         platforms: [linux, darwin]
 
+  # TODO: Make the analysis tools and sanitizers work
+  #
   # dev:
   #   desc: "Development build with sanitizers and analysis tools"
   #   vars:
