@@ -9,7 +9,6 @@ vars:
 tasks:
   default:
     desc: "Build and run the application"
-    deps: [build]
     cmds:
       - task: run
 
@@ -58,7 +57,10 @@ tasks:
       - "{{.BUILD_DIR}}/CMakeCache.txt"
     cmds:
       - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
-      - cmd: "ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json"
+      - cmd: |
+          {{if eq .BUILD_TYPE "Debug"}}
+          ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json
+          {{end}}
         platforms: [linux, darwin]
 
   # Build Steps
@@ -131,9 +133,12 @@ tasks:
     cmds:
       - cmd: find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format -i
         platforms: [linux, darwin]
+      - cmd: find . -name "CMakeLists.txt" -o -name "*.cmake" | grep -v build | xargs gersemi -i
+        platforms: [linux, darwin]
       - cmd: pwsh -c 'Get-ChildItem -Path . -Recurse -Include '*.cpp','*.hpp' | ForEach-Object { clang-format -i $_.FullName }'
         platforms: [windows]
       - cmd: pwsh -c 'Get-ChildItem -Filter "CMakeLists.txt" | ForEach-Object { gersemi -i $_.FullName }'
+        platforms: [windows]
 
   copy-assets:
     desc: "Copy assets and shaders to executable directory"
