@@ -9,8 +9,7 @@ namespace rendy::graphics::vulkan {
 
 template <typename T>
 [[nodiscard]] RENDY_API inline auto VkCheckAndUnwrap(const vk::ResultValue<T> &result_value,
-                                              const std::string_view error_message)
-    -> T {
+                                                     const std::string_view error_message) -> T {
   if (result_value.result != vk::Result::eSuccess) {
     throw std::runtime_error(std::string(error_message) + " | " + vk::to_string(result_value.result));
   }

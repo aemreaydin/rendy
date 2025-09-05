@@ -112,12 +112,13 @@ auto Instance::Initialize(std::span<const char *const> window_extensions) -> boo
   }
 
 #ifdef __APPLE__
-  const auto flags = vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR;
   required_extensions.push_back("VK_KHR_portability_enumeration");
 #endif
   vk::InstanceCreateInfo const instance_create_info{
       .pNext = p_next,
-      .flags = flags,
+#ifdef __APPLE__
+      .flags = vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR,
+#endif
       .pApplicationInfo = &app_info,
       .enabledLayerCount = static_cast<uint32_t>(required_layers.size()),
       .ppEnabledLayerNames = required_layers.data(),

@@ -1,187 +1,169 @@
-version: '3'
+version: "3"
 
 vars:
-  BUILD_TYPE: '{{.BUILD_TYPE | default "Debug"}}'
-  BUILD_DIR: 'build/{{.BUILD_TYPE}}'
-  BIN_DIR: '{{.BUILD_DIR}}/bin'
+  BUILD_TYPE: '{{ .BUILD_TYPE | default "Debug" }}'
   LIB_EXT: '{{if eq OS "windows"}}.lib{{else if eq OS "darwin"}}.dylib{{else}}.so{{end}}'
+  LIB_PREFIX: '{{if eq OS "windows"}}{{else}}lib{{end}}'
   PRESET_OS: '{{if eq OS "windows"}}windows{{else if eq OS "darwin"}}macos{{else}}linux{{end}}'
 
 tasks:
   default:
     desc: "Build and run the application"
-    deps: [ build ]
+    deps: [build]
     cmds:
-    - task: run
+      - task: run
 
   # Clean Build Artifacts
   clean-windows:
-    platforms: [ windows ]
+    platforms: [windows]
     cmds:
-    - pwsh -C "if (Test-Path build) { Remove-Item build -Recurse }"
-    - pwsh -C "if (Test-Path CMakeUserPresets.json ) { Remove-Item CMakeUserPresets.json" }
-    - pwsh -C "if (Test-Path compile_commands.json) { Remove-Item compile_commands.json" }
+      - pwsh -c "if (Test-Path build) { Remove-Item build -Recurse -Force }"
+      - pwsh -c "if (Test-Path CMakeUserPresets.json) { Remove-Item CMakeUserPresets.json }"
+      - pwsh -c "if (Test-Path compile_commands.json) { Remove-Item compile_commands.json }"
     internal: true
   clean-unix:
-    platforms: [ linux, darwin ]
+    platforms: [linux, darwin]
     cmds:
-    - rm -rf build/
-    - rm -f CMakeUserPresets.json
-    - rm -f compile_commands.json
+      - rm -rf build/
+      - rm -f CMakeUserPresets.json
+      - rm -f compile_commands.json
     internal: true
   clean:
     desc: "Clean build artifacts"
     cmds:
-    - task: clean-windows
-    - task: clean-unix
+      - task: clean-windows
+      - task: clean-unix
 
   conan-install:
     desc: "Install Conan dependencies"
+    vars:
+      BUILD_DIR: "build/{{.BUILD_TYPE}}"
     sources:
-    - conanfile.py
+      - conanfile.py
     generates:
-    - '{{.BUILD_DIR}}/generators/conan_toolchain.cmake'
-    - '{{.BUILD_DIR}}/generators/CMakePresets.json'
+      - "{{.BUILD_DIR}}/generators/conan_toolchain.cmake"
+      - "{{.BUILD_DIR}}/generators/CMakePresets.json"
     cmds:
-    - conan install . --output-folder={{.BUILD_DIR}} --build=missing --settings=build_type={{.BUILD_TYPE}}
+      - conan install . --output-folder={{.BUILD_DIR}} --build=missing --settings=build_type={{.BUILD_TYPE}}
   cmake-configure:
     desc: "Configure CMake"
-    deps: [ conan-install ]
+    deps:
+      - task: conan-install
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
+    vars:
+      BUILD_DIR: "build/{{.BUILD_TYPE}}"
     sources:
-    - "**/CMakeLists.txt"
-    - '{{.BUILD_DIR}}/generators/conan_toolchain.cmake'
+      - "**/CMakeLists.txt"
     generates:
-    - '{{.BUILD_DIR}}/CMakeCache.txt'
+      - "{{.BUILD_DIR}}/CMakeCache.txt"
     cmds:
-    - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
-    - cmd: 'ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json'
-      platforms: [linux, darwin]
+      - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
+      - cmd: "ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json"
+        platforms: [linux, darwin]
 
-
-  # CMake Build Steps
+  # Build Steps
   build-libs:
     desc: "Build shared libraries"
-    deps: [ cmake-configure ]
+    deps:
+      - task: cmake-configure
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
+    vars:
+      BUILD_DIR: "build/{{.BUILD_TYPE}}"
     sources:
-    - modules/**/*.hpp
-    - modules/**/*.cpp
+      - modules/**/*.hpp
+      - modules/**/*.cpp
     generates:
-    - '{{.BUILD_DIR}}/lib/{{.BUILD_TYPE}}/rendy_graphics{{.LIB_EXT}}'
+      - "{{.BUILD_DIR}}/lib/{{.BUILD_TYPE}}/{{.LIB_PREFIX}}rendy_graphics{{.LIB_EXT}}"
     cmds:
-    - cmake --build {{.BUILD_DIR}} --target rendy_graphics --parallel
-
+      - cmake --build {{.BUILD_DIR}} --target rendy_graphics --config {{.BUILD_TYPE}} --parallel
   build-exe:
     desc: "Build main executable"
-    deps: [ build-libs ]
+    vars:
+      BUILD_DIR: "build/{{.BUILD_TYPE}}"
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+    deps:
+      - task: build-libs
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
     sources:
-    - src/**/*.cpp
-    - src/**/*.hpp
-    - '{{.BUILD_DIR}}/lib/librendy_graphics.dylib'
+      - src/**/*.cpp
+      - src/**/*.hpp
+      - modules/**/*.hpp
+      - modules/**/*.cpp
     generates:
-    - '{{.BIN_DIR}}/rendy'
+      - "{{.BIN_DIR}}/rendy{{exeExt}}"
     cmds:
-    - cmake --build {{.BUILD_DIR}} --target rendy --parallel
-
-  copy-assets:
-    desc: "Copy assets and shaders to executable directory"
-    sources:
-    - assets/**/*
-    generates:
-    - '{{.BIN_DIR}}/assets/triangle.slang'
-    cmds:
-    - mkdir -p {{.BIN_DIR}}/assets
-    - cp -r assets/* {{.BIN_DIR}}/assets/
-
+      - cmake --build {{.BUILD_DIR}} --target rendy --config {{.BUILD_TYPE}} --parallel
   build:
     desc: "Build the complete application"
-    deps: [ build-exe, copy-assets ]
+    deps:
+      - task: build-exe
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
+      - task: copy-assets
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
 
   run:
     desc: "Run the application"
-    deps: [ build ]
-    dir: '{{.BUILD_DIR}}'
+    deps:
+      - task: build
+        vars: { BUILD_TYPE: "{{.BUILD_TYPE}}" }
+    vars:
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+    dir: "{{.BIN_DIR}}"
     cmds:
-    - ./bin/rendy
+      - cmd: pwsh -c "Start-Process -FilePath 'rendy{{exeExt}}'"
+        platforms: [windows]
+      - cmd: ./rendy{{exeExt}}
+        platforms: [linux, darwin]
 
   debug:
     desc: "Build and run in debug mode"
     cmds:
-    - task: build
-      vars:
-        BUILD_TYPE: Debug
-    - task: run
-      vars:
-        BUILD_TYPE: Debug
+      - task: run
 
   release:
-    desc: "Build and run in release mode"
+    desc: "Build in release mode"
     cmds:
-    - task: build
-      vars:
-        BUILD_TYPE: Release
-    - task: run
-      vars:
-        BUILD_TYPE: Release
+      - task: run
+        vars: { BUILD_TYPE: "Release" }
 
   format:
     desc: "Format C++ code"
     cmds:
-    - find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format -i
+      - cmd: find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format -i
+        platforms: [linux, darwin]
+      - cmd: pwsh -c 'Get-ChildItem -Path . -Recurse -Include '*.cpp','*.hpp' | ForEach-Object { clang-format -i $_.FullName }'
+        platforms: [windows]
+      - cmd: pwsh -c 'Get-ChildItem -Filter "CMakeLists.txt" | ForEach-Object { gersemi -i $_.FullName }'
 
-  dev:
-    desc: "Development build with sanitizers and analysis tools"
+  copy-assets:
+    desc: "Copy assets and shaders to executable directory"
     vars:
-      BUILD_TYPE: Debug
+      BIN_DIR: "build/{{.BUILD_TYPE}}/bin/{{.BUILD_TYPE}}"
+    sources:
+      - assets/**/*
+    generates:
+      - "{{.BIN_DIR}}/assets/**/*"
     cmds:
-    - task: conan-install
-      vars:
-        BUILD_TYPE: Debug
-    - cmake --preset conan-default -DSANITIZE_ADDRESS=ON -DENABLE_CLANG_TIDY=ON
-    - task: build-libs
-      vars:
-        BUILD_TYPE: Debug
-    - task: build-exe
-      vars:
-        BUILD_TYPE: Debug
-    - task: copy-assets
-      vars:
-        BUILD_TYPE: Debug
+      - cmd: pwsh -c "Copy-Item assets {{.BIN_DIR}}/assets -Recurse -Force"
+        platforms: [windows]
+      - cmd: mkdir -p {{.BIN_DIR}}/assets && cp -r assets/* {{.BIN_DIR}}/assets/
+        platforms: [linux, darwin]
 
-  install-deps:
-    desc: "Install system dependencies (Task runner)"
-    cmds:
-    - |
-      if ! command -v task &> /dev/null; then
-        echo "Installing Task runner..."
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-          brew install go-task/tap/go-task
-        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-          sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
-        fi
-      else
-        echo "Task runner already installed"
-      fi
-
-  help:
-    desc: "Show available tasks"
-    silent: true
-    cmds:
-    - echo "Available tasks:"
-    - echo "  default     - Build and run the application (debug mode)"
-    - echo "  clean       - Clean all build artifacts"
-    - echo "  build       - Build the complete application"
-    - echo "  run         - Run the application"
-    - echo "  debug       - Build and run in debug mode"
-    - echo "  release     - Build and run in release mode"
-    - echo "  dev         - Development build with sanitizers"
-    - echo "  format      - Format C++ code with clang-format"
-    - echo "  help        - Show this help message"
-    - echo ""
-    - echo "Variables:"
-    - echo "  BUILD_TYPE  - Set to Debug or Release (default Debug)"
-    - echo ""
-    - echo "Examples:"
-    - echo "  task"
-    - echo "  task release"
-    - echo "  task BUILD_TYPE=Release build"
-    - echo "  task dev"
+  # dev:
+  #   desc: "Development build with sanitizers and analysis tools"
+  #   vars:
+  #     BUILD_TYPE: Debug
+  #   cmds:
+  #     - task: conan-install
+  #       vars:
+  #         BUILD_TYPE: Debug
+  #     - cmake --preset conan-default -DSANITIZE_ADDRESS=ON -DENABLE_CLANG_TIDY=ON
+  #     - task: build-libs
+  #       vars:
+  #         BUILD_TYPE: Debug
+  #     - task: build-exe
+  #       vars:
+  #         BUILD_TYPE: Debug
+  #     - task: copy-assets
+  #       vars:
+  #         BUILD_TYPE: Debug

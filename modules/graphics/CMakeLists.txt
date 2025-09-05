@@ -54,8 +54,8 @@ target_compile_definitions(
 # Link dependencies
 target_link_libraries(
     rendy_graphics
-    PUBLIC
-    PRIVATE Vulkan::Vulkan spdlog::spdlog glfw
+    PUBLIC spdlog::spdlog glfw
+    PRIVATE Vulkan::Vulkan
 )
 
 if(MSVC)

@@ -1,16 +1,16 @@
 #pragma once
 
 #include "core/enums.hpp"
+#include "rendy_api_export.h"
 #include <map>
 #include <optional>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include "rendy_api_export.h"
 
 namespace rendy::graphics::vulkan {
 
 struct QueueFamilyIndices {
-  uint32_t graphics_family{};                // Required (also handles presentation)
+  uint32_t graphics_family{};              // Required (also handles presentation)
   std::optional<uint32_t> compute_family;  // Optional
   std::optional<uint32_t> transfer_family; // Optional
 };

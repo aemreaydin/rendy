@@ -133,8 +133,6 @@ auto PhysicalDevice::querySwapChainSupport(vk::PhysicalDevice device, vk::Surfac
   SwapChainSupportDetails details;
 
   spdlog::info("Querying Device Capabilities");
-  spdlog::debug("Physical device handle: {}", reinterpret_cast<void*>(static_cast<VkPhysicalDevice>(device)));
-  spdlog::debug("Surface handle: {}", reinterpret_cast<void*>(static_cast<VkSurfaceKHR>(surface)));
 
   // First check if device supports presentation on any queue family for this surface
   bool presentation_supported = false;

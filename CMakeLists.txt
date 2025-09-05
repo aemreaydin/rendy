@@ -15,8 +15,6 @@ option(SANITIZE_UNDEFINED "Enable UndefinedBehaviorSanitizer (UBSan)" OFF)
 option(SANITIZE_LEAK "Enable LeakSanitizer (LSan)" OFF)
 option(SANITIZE_THREAD "Enable ThreadSanitizer (TSan)" OFF)
 
-
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     if(SANITIZE_ADDRESS)
         add_compile_options(-fsanitize=address)
@@ -76,7 +74,8 @@ if(ENABLE_IWYU)
     set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "include-what-you-use;-w;-Xiwyu")
 endif()
 
-
+find_package(Vulkan REQUIRED)
+message(STATUS "Found Vulkan SDK: ${Vulkan_INCLUDE_DIRS}")
 find_package(imgui REQUIRED)
 message(STATUS "Found imgui: ${imgui_INCLUDE_DIRS}")
 find_package(spdlog REQUIRED)
@@ -85,13 +84,9 @@ find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_INCLUDE_DIRS}")
 find_package(glfw3 REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_INCLUDE_DIRS}")
-find_package(Vulkan REQUIRED)
-message(STATUS "Found Vulkan SDK: ${Vulkan_INCLUDE_DIRS}")
 
 # add_subdirectory(modules/common)
 # add_subdirectory(modules/engine_core)
 add_subdirectory(modules/graphics)
 # add_subdirectory(modules/game_logic) # This is a hot-reloadable example
 add_subdirectory(src)
-
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
