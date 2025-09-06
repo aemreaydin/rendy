@@ -1,7 +1,5 @@
-import os
 from conan import ConanFile
-from conan.tools.cmake import CMake
-from conan.tools.files import copy
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 
 
 class RendyEngineConan(ConanFile):
@@ -32,7 +30,15 @@ class RendyEngineConan(ConanFile):
         "spdlog/1.15.3",
     )
 
-    generators = "CMakeDeps", "CMakeToolchain", "VirtualRunEnv"
+    def generate(self):
+        cmake = CMakeDeps(self)
+        cmake.generate()
+        tc = CMakeToolchain(self)
+        if self.settings.os == "Windows":
+            tc.generator = "Ninja"
+        else:
+            tc.generator = "Unix Makefiles"
+        tc.generate()
 
     def config_options(self):
         if self.settings.os == "Windows":

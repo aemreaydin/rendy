@@ -7,7 +7,8 @@
 constexpr int kWidth = 800;
 constexpr int kHeight = 600;
 
-static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+static void KeyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action,
+                        [[maybe_unused]] int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }

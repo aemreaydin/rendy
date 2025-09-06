@@ -18,14 +18,12 @@ tasks:
     cmds:
       - pwsh -c "if (Test-Path build) { Remove-Item build -Recurse -Force }"
       - pwsh -c "if (Test-Path CMakeUserPresets.json) { Remove-Item CMakeUserPresets.json }"
-      - pwsh -c "if (Test-Path compile_commands.json) { Remove-Item compile_commands.json }"
     internal: true
   clean-unix:
     platforms: [linux, darwin]
     cmds:
       - rm -rf build/
       - rm -f CMakeUserPresets.json
-      - rm -f compile_commands.json
     internal: true
   clean:
     desc: "Clean build artifacts"
@@ -58,11 +56,6 @@ tasks:
       - "{{.BUILD_DIR}}/CMakeCache.txt"
     cmds:
       - cmake --preset conan-{{.PRESET_OS}}-{{.BUILD_TYPE | lower}}
-      - cmd: |
-          {{if eq .BUILD_TYPE "Debug"}}
-          ln {{.BUILD_DIR}}/compile_commands.json compile_commands.json
-          {{end}}
-        platforms: [linux, darwin]
 
   # Build Steps
   build-libs:
